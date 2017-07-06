@@ -1,6 +1,6 @@
-# Class: dhcpd
+# Class: dhcpd6
 #
-# Installs and enables a dhcpd server. You must specify either `$configsource`
+# Installs and enables a dhcpd6 server. You must specify either `$configsource`
 # or `$configcontent`.
 #
 # Parameters:
@@ -8,62 +8,52 @@
 #    Puppet location of the configuration file to use. Default: none
 #  $configcontent:
 #    Content of the configuration file to use. Default: none
-#  $dhcpdargs:
-#    Command-line arguments to be added to dhcpd. Default: empty
+#  $dhcpd6args:
+#    Command-line arguments to be added to dhcpd6. Default: empty
 #  $ensure:
 #    Ensure parameter for the service. Default: undefined
 #  $enable:
 #    Enable parameter for the service. Default: true
 #
 # Sample Usage :
-#  class { 'dhcpd':
-#    configsource => 'puppet:///files/dhcpd.conf-foo',
+#  class { 'dhcpd6':
+#    configsource => 'puppet:///files/dhcpd6.conf-foo',
 #    # Restrict listening to a single interface
-#    dhcpdargs    => 'eth1',
+#    dhcpd6args    => 'eth1',
 #    # Default is to enable but allow to be stopped (for active/passive)
 #    ensure       => 'running',
 #  }
 #
-class dhcpd (
+class dhcpd6 (
   $configsource  = undef,
   $configcontent = undef,
-  $dhcpdargs     = '',
+  $dhcpd6args    = '',
   $ensure        = undef,
   $enable        = true,
+  $installpkg    = true, # set to false if using dhcpd module too
 ) {
 
-  package { 'dhcp': ensure => installed }
+  if $installpkg {
+    package { 'dhcp': ensure => installed }
+  }
 
-  service { 'dhcpd':
+  service { 'dhcpd6':
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
     require   => Package['dhcp'],
   }
 
-  file { '/etc/sysconfig/dhcpd':
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => template('dhcpd/dhcpd.sysconfig.erb'),
-    notify  => Service['dhcpd'],
-  }
+  $dhcpd6_conf = '/etc/dhcp/dhcpd6.conf'
 
-  # RHEL 5 has a different location
-  if versioncmp($::operatingsystemrelease, '6') < 0 {
-    $dhcpd_conf = '/etc/dhcpd.conf'
-  } else {
-    $dhcpd_conf = '/etc/dhcp/dhcpd.conf'
-  }
-  file { $dhcpd_conf :
+  file { $dhcpd6_conf :
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
     source  => $configsource,
     content => $configcontent,
     require => Package['dhcp'],
-    notify  => Service['dhcpd'],
+    notify  => Service['dhcpd6'],
   }
 
 }
-

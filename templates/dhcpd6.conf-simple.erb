@@ -1,0 +1,94 @@
+<%# This template is provided as a convenience -%>
+<%# and might change without warning -%>
+<%
+
+if @dhcpd6_default_lease_time
+  default_lease_time = @dhcpd6_default_lease_time
+else
+#  (at the end the address is no longer usable by the client)
+#  (set to 30 days, the usual IPv6 default)
+  default_lease_time = '2592000'
+end
+
+if @dhcpd6_preferred_lifetime
+  preferred_lifetime = @dhcpd6_preferred_lifetime
+else
+#  (at the end the address is deprecated, i.e., the client should use
+#   other addresses for new connections)
+#  (set to 7 days, the	usual IPv6 default)
+  preferred_lifetime = '604800'
+end
+
+if @dhcpd6_renewal_time
+  renewal_time = @dhcpd6_renewal_time
+else
+#  (default is 1/2 preferred lifetime)
+#  (set to 1 hour)
+  renewal_time = '3600'
+end
+
+if @dhcpd6_rebinding_time
+  rebinding_time = @dhcpd6_rebinding_time
+else
+#  (default is 3/4 preferred lifetime)
+#  (set to 2 hours)
+  rebinding_time = '7200'
+end
+
+if @dhcpd6_domain_name_servers
+  domain_name_servers = @dhcpd6_domain_name_servers
+else
+  domain_name_servers = '2001:4860:4860::8888, 2001:4860:4860::8844'
+end
+
+if @dhcpd6_domain_search
+  domain_search = @dhcpd6_domain_search
+else
+  domain_search = '"test.example.com","example.com"'
+end
+
+if @dhcpd6_refresh_time
+  refresh_time = @dhcpd6_refresh_time
+else
+#  (minimum is 10 minutes, maximum one day, default is to not refresh)
+#  (set to 6 hours)
+  refresh_time = '21600'
+end
+
+-%>
+# Server configuration file example for DHCPv6
+# From the file used for TAHI tests.
+#authoritative;
+
+# IPv6 address valid lifetime
+default-lease-time <= default_lease_time %>;
+
+# IPv6 address preferred lifetime
+preferred-lifetime <= preferred_lifetime %>;
+
+# T1, the delay before Renew
+option dhcp-renewal-time <= renewal_time %>;
+
+# T2, the delay before Rebind (if Renews failed)
+option dhcp-rebinding-time <= rebinding_time %>;
+
+# Enable RFC 5007 support (same than for DHCPv4)
+allow leasequery;
+
+# Global definitions for name server address(es) and domain search list
+option dhcp6.name-servers <%= domain_name_servers %>;
+option dhcp6.domain-search <%= domain_search %>;
+
+# Set preference to 255 (maximum) in order to avoid waiting for
+# additional servers when there is only one
+##option dhcp6.preference 255;
+
+# Server side command to enable rapid-commit (2 packet exchange)
+##option dhcp6.rapid-commit;
+
+# The delay before information-request refresh
+option dhcp6.info-refresh-time <%= refresh_time %>;
+
+# The path of the lease file
+dhcpv6-lease-file-name "/var/lib/dhcpd/dhcpd6.leases";
+

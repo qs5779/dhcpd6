@@ -1,27 +1,27 @@
 {
-  "name": "thias-dhcpd",
-  "version": "1.0.1",
-  "author": "Matthias Saou",
+  "name":"que-dhcpd6",
+  "version": "1.0.0",
+  "author": "Quien Sabe",
   "license": "Apache-2.0",
-  "summary": "Install, enable and configure a Dynamic Host Control Protocol (DHCP) server.",
-  "source": "git://github.com/thias/puppet-dhcpd",
-  "project_page": "https://github.com/thias/puppet-dhcpd",
-  "issues_url": "https://github.com/thias/puppet-dhcpd/issues",
-  "tags": [ "dhcpd", "dhcp" ],
+  "summary": "Install, enable and configure a Dynamic Host Control Protocol (DHCP6) server.",
+  "source": "git://github.com/qs5779/puppet-dhcpd6",
+  "project_page": "https://github.com/qs5779/dhcpd6",
+  "issues_url": "https://github.com/qs5779/puppet-dhcpd6/issues",
+  "tags": [ "dhcpd6", "dhcp", "ipv6" ],
   "operatingsystem_support": [
     {
     "operatingsystem": "RedHat",
-    "operatingsystemrelease": [ "5", "6", "7" ]
+    "operatingsystemrelease": [ "6", "7" ]
     },
     {
     "operatingsystem": "CentOS",
-    "operatingsystemrelease": [ "5", "6", "7" ]
+    "operatingsystemrelease": [ "6", "7" ]
     }
   ],
   "requirements": [
     {
     "name": "puppet",
-    "version_requirement": ">=2.7.20 <4.1.0"
+    "version_requirement": ">=2.7.20"
     }
   ],
   "dependencies": [
