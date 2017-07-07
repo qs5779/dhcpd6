@@ -115,10 +115,21 @@ host <%= key %> {
   option <%= line %>;
 <% end -%>
 <% end -%>
-};
+}
+
 <% end -%>
 <% end -%>
 
+<% if !@ddns_keys.empty? -%>
+<% @ddns_keys.sort_by {|key, value| key}.each do |key,value| -%>
+key "<%= key %>" {
+<% value.each do |line| -%>
+    <%= line %>;
+<% end -%>
+};
+
+<% end -%>
+<% end -%>
 # Your subnets go here
 
 
