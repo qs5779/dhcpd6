@@ -30,10 +30,10 @@ class dhcpd6 (
   $dhcpd6args    = '',
   $ensure        = undef,
   $enable        = true,
-  $installpkg    = true, # set to false if using dhcpd module too
+  $install       = true, # set false if also using dhcpd module
 ) {
 
-  if $installpkg {
+  if $install {
     package { 'dhcp': ensure => installed }
   }
 

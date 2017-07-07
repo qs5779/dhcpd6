@@ -56,21 +56,25 @@ else
 end
 
 -%>
+# NOTE: file managed by puppet
 # Server configuration file example for DHCPv6
 # From the file used for TAHI tests.
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
 #authoritative;
 
 # IPv6 address valid lifetime
-default-lease-time <= default_lease_time %>;
+default-lease-time <%= default_lease_time %>;
 
 # IPv6 address preferred lifetime
-preferred-lifetime <= preferred_lifetime %>;
+preferred-lifetime <%= preferred_lifetime %>;
 
 # T1, the delay before Renew
-option dhcp-renewal-time <= renewal_time %>;
+option dhcp-renewal-time <%= renewal_time %>;
 
 # T2, the delay before Rebind (if Renews failed)
-option dhcp-rebinding-time <= rebinding_time %>;
+option dhcp-rebinding-time <%= rebinding_time %>;
 
 # Enable RFC 5007 support (same than for DHCPv4)
 allow leasequery;
@@ -92,3 +96,38 @@ option dhcp6.info-refresh-time <%= refresh_time %>;
 # The path of the lease file
 dhcpv6-lease-file-name "/var/lib/dhcpd/dhcpd6.leases";
 
+<% if !@dhcpd6_hosts.empty? -%>
+
+<% @dhcpd6_hosts.sort_by {|key,value| key}.each do |key,value| -%>
+host <%= key %> {
+<% if value['host-identifier'] and !value['host-identifier'].empty? -%>
+  host-identifier option dhcp6.client-id <%= value['host-identifier'] %>;
+<% end -%>
+<% if value['fixed-address6'] and !value['fixed-address6'].empty? -%>
+  fixed-address6 <%= value['fixed-address6'] %>;
+<% end -%>
+<% if value['fixed-prefix6'] and !value['fixed-prefix6'].empty? -%>
+  fixed-prefix6 <%= value['fixed-prefix6'] %>;
+<% end -%>
+<% if value['options'] and !value['options'].empty? -%>
+  # Host specific options
+<% value['options'].each do |line| -%>
+  option <%= line %>;
+<% end -%>
+<% end -%>
+};
+<% end -%>
+<% end -%>
+
+# Your subnets go here
+
+
+# Some helpfull logging statements
+option dhcp6.macaddr code 193 = string;
+option dhcp6.leased-address code 194 = string;
+option dhcp6.macaddr = binary-to-ascii(16, 8, ":", suffix(option dhcp6.client-id, 6));
+option dhcp6.leased-address = binary-to-ascii(16,16, ":", substring(suffix(option dhcp6.ia-na, 24),0,16));
+log(info, concat ("--> Lease for ",config-option dhcp6.leased-address, " leased to ", config-option dhcp6.macaddr));
+log(info, concat("--> Client-FQDN: ", option fqdn.fqdn));
+log(info, concat("--> Client-DUID: ", binary-to-ascii(16, 8, ":", option dhcp6.client-id)));
+log(info, concat("--> Client-ID: ", binary-to-ascii(16, 8, ":", option dhcp-client-identifier)));
